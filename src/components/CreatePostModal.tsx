@@ -10,7 +10,7 @@ interface CreatePostModalProps {
   onCreatePost: (title: string, content: string) => void;
 }
 
-const MAX_CONTENT_LENGTH = 240;
+const MAX_CONTENT_LENGTH = 500; // Updated to 500 characters max
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ 
   isOpen, 
@@ -29,7 +29,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
       setContent(newContent);
       setError('');
     } else {
-      setError('Your post exceeds the maximum 240 characters');
+      setError(`Your post exceeds the maximum ${MAX_CONTENT_LENGTH} characters`);
     }
   };
   
@@ -128,7 +128,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   "bg-background min-h-[100px] resize-none",
                   "focus:outline-none focus:ring-2 focus:ring-primary/30"
                 )}
-                placeholder="Share your political thoughts (max 240 characters)"
+                placeholder="Share your political thoughts (max 500 characters)"
               />
               <div className="flex justify-between items-center mt-1">
                 <span className={cn(

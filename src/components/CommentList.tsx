@@ -78,7 +78,7 @@ const CommentList: React.FC = () => {
   const { speakText } = useSettings();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const commentsPerPage = 3;
+  const commentsPerPage = 5; // Updated to 5 posts per page
 
   // Filter comments based on search query
   const filteredComments = SAMPLE_COMMENTS.filter(comment => {
@@ -140,8 +140,8 @@ const CommentList: React.FC = () => {
             const isExpanded = expandedComments[comment.id] || false;
             const displayContent = isExpanded 
               ? comment.content 
-              : comment.content.length > 100 
-                ? `${comment.content.slice(0, 100)}...` 
+              : comment.content.length > 200  // Updated to 200 characters threshold
+                ? `${comment.content.slice(0, 200)}...` 
                 : comment.content;
 
             return (
@@ -153,10 +153,10 @@ const CommentList: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <span>{comment.author}</span>
                     <span>•</span>
-                    <span>{comment.createdAt}</span>
+                    <span className="whitespace-nowrap">{comment.createdAt}</span> {/* Ensure timestamp is always visible */}
                   </div>
                   <div className="flex gap-2">
-                    {comment.content.length > 100 && (
+                    {comment.content.length > 200 && ( // Updated to 200 characters threshold
                       <button 
                         onClick={() => toggleExpand(comment.id)}
                         className="text-primary hover:underline text-xs"

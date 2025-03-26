@@ -36,13 +36,6 @@ const Index: React.FC = () => {
       </div>
 
       <div className="space-y-4">
-        {comments.length > 0 && (
-          <div className="space-y-4">
-            {comments.map((comment) => (
-              <CommentList key={comment.id} />
-            ))}
-          </div>
-        )}
         <CommentList />
       </div>
 
