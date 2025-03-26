@@ -21,7 +21,7 @@ const SAMPLE_COMMENTS: CommentType[] = [
   {
     id: '3',
     title: 'Climate Action Is Urgent',
-    content: 'We cannot continue to delay meaningful action on climate change. The science is clear, and we're already seeing the impacts. We need bold policy initiatives that transition us to clean energy without leaving workers behind.',
+    content: "We cannot continue to delay meaningful action on climate change. The science is clear, and we're already seeing the impacts. We need bold policy initiatives that transition us to clean energy without leaving workers behind.",
     author: 'GreenFuture',
     createdAt: '1 day ago'
   },
@@ -35,7 +35,7 @@ const SAMPLE_COMMENTS: CommentType[] = [
   {
     id: '5',
     title: 'Infrastructure Investment',
-    content: 'Our nation's infrastructure is crumbling, and it's holding back economic growth. We need a comprehensive plan to rebuild roads, bridges, airports, and digital infrastructure. This would create jobs and boost productivity.',
+    content: "Our nation's infrastructure is crumbling, and it's holding back economic growth. We need a comprehensive plan to rebuild roads, bridges, airports, and digital infrastructure. This would create jobs and boost productivity.",
     author: 'BuildItBetter',
     createdAt: '3 days ago'
   }
