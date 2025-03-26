@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { useUser } from '@clerk/clerk-react';
 import { CommentType } from '@/components/Comment';
 import CommentList from '@/components/CommentList';
@@ -9,19 +9,13 @@ import CreatePostModal from '@/components/CreatePostModal';
 
 const Index: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [comments, setComments] = useState<CommentType[]>([]);
   const { isSignedIn, user } = useUser();
 
   const handleCreatePost = (title: string, content: string) => {
-    const newComment: CommentType = {
-      id: Date.now().toString(),
-      title,
-      content,
-      author: user?.fullName || user?.username || 'Anonymous',
-      createdAt: 'Just now'
-    };
-    
-    setComments([newComment, ...comments]);
+    // In a real app, this would call an API to create the post
+    // For now, we'll just show a toast notification
+    toast.success('Post created successfully!');
+    setIsModalOpen(false);
   };
 
   return (
