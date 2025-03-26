@@ -1,24 +1,45 @@
 
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useUser, useClerk } from '@clerk/clerk-react';
 import { cn } from "@/lib/utils";
-import { Home, Settings, Menu, X } from 'lucide-react';
+import { Home, Settings, Menu, X, LogIn, UserPlus, LogOut, Shield } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useSettings } from '@/contexts/SettingsContext';
 
 type NavItem = {
   path: string;
   label: string;
   icon: React.ElementType;
+  requiresAuth?: boolean;
+  adminOnly?: boolean;
 };
-
-const navItems: NavItem[] = [
-  { path: '/', label: 'Home', icon: Home },
-  { path: '/settings', label: 'Settings', icon: Settings },
-];
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
+  const { theme, toggleTheme } = useSettings();
+  
+  // Check if user is admin
+  const isAdmin = user?.publicMetadata?.role === 'admin';
+  
+  const navItems: NavItem[] = [
+    { path: '/', label: 'Home', icon: Home },
+    { path: '/settings', label: 'Settings', icon: Settings, requiresAuth: true },
+  ];
+  
+  // Add admin route if user is admin
+  if (isAdmin) {
+    navItems.push({ 
+      path: '/admin', 
+      label: 'Admin Dashboard', 
+      icon: Shield, 
+      requiresAuth: true,
+      adminOnly: true 
+    });
+  }
   
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
@@ -87,25 +108,70 @@ const Sidebar = () => {
           </div>
           
           <nav className="flex-1 space-y-1">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) => cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200",
-                  isActive 
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground" 
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                )}
-                onClick={() => isMobile && setIsOpen(false)}
-              >
-                <item.icon size={18} />
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
+            {navItems.map((item) => {
+              // Skip admin-only items for non-admins
+              if (item.adminOnly && !isAdmin) return null;
+              
+              // Skip auth-required items for signed-out users
+              if (item.requiresAuth && !isSignedIn) return null;
+              
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={({ isActive }) => cn(
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200",
+                    isActive 
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground" 
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  )}
+                  onClick={() => isMobile && setIsOpen(false)}
+                >
+                  <item.icon size={18} />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
           </nav>
           
-          <div className="border-t border-sidebar-border pt-6 mt-6">
+          <div className="border-t border-sidebar-border pt-6 mt-6 space-y-3">
+            {isSignedIn ? (
+              <div className="space-y-3">
+                <div className="flex items-center px-3 py-2">
+                  <div className="flex-1 mr-2">
+                    <p className="text-sm font-medium truncate">{user?.fullName || user?.username}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user?.primaryEmailAddress?.emailAddress}</p>
+                  </div>
+                  <button
+                    onClick={() => signOut()}
+                    className="p-2 rounded-md hover:bg-sidebar-accent text-sidebar-foreground"
+                    aria-label="Sign out"
+                  >
+                    <LogOut size={18} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <NavLink
+                  to="/sign-in"
+                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  onClick={() => isMobile && setIsOpen(false)}
+                >
+                  <LogIn size={18} />
+                  <span>Sign In</span>
+                </NavLink>
+                <NavLink
+                  to="/sign-up"
+                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  onClick={() => isMobile && setIsOpen(false)}
+                >
+                  <UserPlus size={18} />
+                  <span>Sign Up</span>
+                </NavLink>
+              </div>
+            )}
+            
             <div className="rounded-md bg-sidebar-accent px-3 py-4">
               <h3 className="text-sm font-medium">Political Forum</h3>
               <p className="mt-1 text-xs text-sidebar-foreground/80">

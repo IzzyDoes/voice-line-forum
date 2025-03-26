@@ -1,13 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Comment, { CommentType } from './Comment';
+import { useSettings } from '@/contexts/SettingsContext';
 
 // Sample data
 const SAMPLE_COMMENTS: CommentType[] = [
   {
     id: '1',
     title: 'Healthcare Reform Needed',
-    content: 'I believe our healthcare system needs major reform. The current approach is leaving too many people without access to proper medical care. We should consider models from other countries that provide universal coverage while maintaining quality and innovation.',
+    content: "I believe our healthcare system needs major reform. The current approach is leaving too many people without access to proper medical care. We should consider models from other countries that provide universal coverage while maintaining quality and innovation.",
     author: 'PolicyWonk',
     createdAt: '2 hours ago'
   },
@@ -42,11 +43,63 @@ const SAMPLE_COMMENTS: CommentType[] = [
 ];
 
 const CommentList: React.FC = () => {
+  const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
+  const { speakText } = useSettings();
+
+  const toggleExpand = (id: string) => {
+    setExpandedComments(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const handleReadAloud = (comment: CommentType) => {
+    const textToRead = `${comment.title}. ${comment.content}`;
+    speakText(textToRead);
+  };
+
   return (
     <div className="space-y-4">
-      {SAMPLE_COMMENTS.map((comment) => (
-        <Comment key={comment.id} comment={comment} />
-      ))}
+      {SAMPLE_COMMENTS.map((comment) => {
+        const isExpanded = expandedComments[comment.id] || false;
+        const displayContent = isExpanded 
+          ? comment.content 
+          : comment.content.length > 100 
+            ? `${comment.content.slice(0, 100)}...` 
+            : comment.content;
+
+        return (
+          <div key={comment.id} className="rounded-lg border bg-card shadow-sm p-4">
+            <h3 className="text-lg font-semibold mb-1">{comment.title}</h3>
+            <p className="text-sm mb-2">{displayContent}</p>
+            
+            <div className="flex justify-between items-center text-xs text-muted-foreground mt-2">
+              <div className="flex items-center gap-2">
+                <span>{comment.author}</span>
+                <span>•</span>
+                <span>{comment.createdAt}</span>
+              </div>
+              <div className="flex gap-2">
+                {comment.content.length > 100 && (
+                  <button 
+                    onClick={() => toggleExpand(comment.id)}
+                    className="text-primary hover:underline text-xs"
+                  >
+                    {isExpanded ? 'Show less' : 'Show more'}
+                  </button>
+                )}
+                <button
+                  onClick={() => handleReadAloud(comment)}
+                  className="text-primary hover:underline text-xs ml-2"
+                  aria-label="Read aloud"
+                >
+                  Read aloud
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };

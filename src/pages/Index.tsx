@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Toaster } from 'sonner';
+import { useUser } from '@clerk/clerk-react';
 import { CommentType } from '@/components/Comment';
 import CommentList from '@/components/CommentList';
 import CreatePostButton from '@/components/CreatePostButton';
@@ -9,13 +10,14 @@ import CreatePostModal from '@/components/CreatePostModal';
 const Index: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [comments, setComments] = useState<CommentType[]>([]);
+  const { isSignedIn, user } = useUser();
 
   const handleCreatePost = (title: string, content: string) => {
     const newComment: CommentType = {
       id: Date.now().toString(),
       title,
       content,
-      author: 'Anonymous',
+      author: user?.fullName || user?.username || 'Anonymous',
       createdAt: 'Just now'
     };
     
@@ -44,12 +46,18 @@ const Index: React.FC = () => {
         <CommentList />
       </div>
 
-      <CreatePostButton onClick={() => setIsModalOpen(true)} />
-      <CreatePostModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onCreatePost={handleCreatePost}
-      />
+      {isSignedIn && (
+        <CreatePostButton onClick={() => setIsModalOpen(true)} />
+      )}
+      
+      {isSignedIn && (
+        <CreatePostModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          onCreatePost={handleCreatePost}
+        />
+      )}
+      
       <Toaster position="top-center" />
     </div>
   );
