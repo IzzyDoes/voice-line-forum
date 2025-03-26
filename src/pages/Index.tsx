@@ -28,7 +28,7 @@ const Index: React.FC = () => {
     <div className="container py-8 animate-fade-in max-w-2xl">
       <div className="mb-8">
         <div className="space-y-1 pb-6 border-b">
-          <h1 className="text-3xl font-bold tracking-tight">Political Forum</h1>
+          <h1 className="text-3xl font-bold tracking-tight">LeftPlot</h1>
           <p className="text-muted-foreground">
             A space to voice your political opinions and engage in respectful debate.
           </p>
