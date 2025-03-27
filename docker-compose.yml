@@ -1,0 +1,70 @@
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14
+    container_name: leftplot-postgres
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: leftplot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    networks:
+      - leftplot-network
+
+  # Backend API Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: leftplot-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      PORT: 5000
+      PGHOST: postgres
+      PGUSER: postgres
+      PGDATABASE: leftplot
+      PGPASSWORD: postgres123
+      PGPORT: 5432
+      JWT_SECRET: your_jwt_secret_should_be_in_env_file
+    ports:
+      - "5000:5000"
+    networks:
+      - leftplot-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: >
+      sh -c "sleep 5 &&
+             npm start"
+
+  # Frontend React App
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: leftplot-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+    ports:
+      - "3000:80"
+    networks:
+      - leftplot-network
+
+networks:
+  leftplot-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
