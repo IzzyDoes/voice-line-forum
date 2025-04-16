@@ -4,7 +4,7 @@ import { Settings as SettingsIcon, Moon, Sun, Type, Accessibility, User } from '
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useSettings } from '@/contexts/SettingsContext';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserSettings from '@/components/UserSettings';
 
@@ -18,7 +18,7 @@ const Settings: React.FC = () => {
     toggleTextToSpeech 
   } = useSettings();
   
-  const { user } = useUser();
+  const { user } = useAuth();
 
   return (
     <div className="container py-8 animate-fade-in max-w-2xl">
