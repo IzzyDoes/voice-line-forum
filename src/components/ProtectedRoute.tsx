@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { useUser, useAuth } from '@clerk/clerk-react';
 import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -12,17 +12,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children, 
   requiredRole 
 }) => {
-  const { isLoaded, isSignedIn, user } = useUser();
-  const { getToken } = useAuth();
+  const { isAuthenticated, isLoading, isAdmin } = useAuth();
   
-  // Check if the user is an admin (you'd need to set up this claim/metadata in Clerk)
-  const isAdmin = user?.publicMetadata?.role === 'admin';
-
-  if (!isLoaded) {
+  if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
-  if (!isSignedIn) {
+  if (!isAuthenticated) {
     return <Navigate to="/sign-in" replace />;
   }
 

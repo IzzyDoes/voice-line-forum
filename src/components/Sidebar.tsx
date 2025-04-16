@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from "@/lib/utils";
 import { Home, Settings, Menu, X, LogIn, UserPlus, LogOut, Shield } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -18,12 +18,8 @@ type NavItem = {
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
-  const { isSignedIn, user } = useUser();
-  const { signOut } = useClerk();
+  const { user, isAuthenticated, logout, isAdmin } = useAuth();
   const { theme, toggleTheme } = useSettings();
-  
-  // Check if user is admin
-  const isAdmin = user?.publicMetadata?.role === 'admin';
   
   const navItems: NavItem[] = [
     { path: '/', label: 'Home', icon: Home },
@@ -113,7 +109,7 @@ const Sidebar = () => {
               if (item.adminOnly && !isAdmin) return null;
               
               // Skip auth-required items for signed-out users
-              if (item.requiresAuth && !isSignedIn) return null;
+              if (item.requiresAuth && !isAuthenticated) return null;
               
               return (
                 <NavLink
@@ -135,15 +131,15 @@ const Sidebar = () => {
           </nav>
           
           <div className="border-t border-sidebar-border pt-6 mt-6 space-y-3">
-            {isSignedIn ? (
+            {isAuthenticated && user ? (
               <div className="space-y-3">
                 <div className="flex items-center px-3 py-2">
                   <div className="flex-1 mr-2">
-                    <p className="text-sm font-medium truncate">{user?.fullName || user?.username}</p>
-                    <p className="text-xs text-muted-foreground truncate">{user?.primaryEmailAddress?.emailAddress}</p>
+                    <p className="text-sm font-medium truncate">{user.username}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                   </div>
                   <button
-                    onClick={() => signOut()}
+                    onClick={() => logout()}
                     className="p-2 rounded-md hover:bg-sidebar-accent text-sidebar-foreground"
                     aria-label="Sign out"
                   >

@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Loader2, Save } from 'lucide-react';
+import { userApi } from '@/api';
 
 const UserSettings: React.FC = () => {
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const { user, logout } = useAuth();
   const [username, setUsername] = useState(user?.username || '');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -19,9 +19,7 @@ const UserSettings: React.FC = () => {
     
     try {
       setIsLoading(true);
-      await user.update({
-        username,
-      });
+      await userApi.updateProfile(username);
       toast.success('Username updated successfully');
     } catch (error) {
       console.error('Error updating username:', error);
@@ -32,7 +30,7 @@ const UserSettings: React.FC = () => {
   };
 
   const handleSignOut = () => {
-    signOut();
+    logout();
   };
 
   if (!user) return null;
@@ -57,14 +55,11 @@ const UserSettings: React.FC = () => {
         <div className="space-y-1">
           <Label className="text-muted-foreground">Email</Label>
           <div className="text-sm p-2 bg-muted rounded">
-            {user.primaryEmailAddress?.emailAddress}
+            {user.email}
             <span className="ml-2 text-xs px-1.5 py-0.5 bg-primary/10 text-primary rounded">
               Primary
             </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            To change your email, please use the Clerk user settings
-          </p>
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
